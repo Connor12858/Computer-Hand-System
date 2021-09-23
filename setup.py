@@ -1,15 +1,19 @@
 import re
 import time
+import os
 import cv2
 import pyttsx3
 import encryptionSystem as Es
 import speech_recognition as sr
+from pathlib import Path
 
 
 key = cv2. waitKey(1)
 webcam = cv2.VideoCapture(0)
 engine = pyttsx3.init()
 r = sr.Recognizer()
+
+adminPassword = "admin"
 
 
 def voice():
@@ -28,9 +32,34 @@ def voice():
 
 
 def speak(message):
-    engine.say(message)
-    engine.runAndWait()
+    print(message)
+    # engine.say(message)
+    # engine.runAndWait()
     time.sleep(1)
+
+
+def changeAdmin():
+    speak("Please wait while we reset")
+    folder_loc = os.getcwd() + "\\allowed_faces\\"
+    photos = [os.path.join(folder_loc, f) for f in os.listdir(folder_loc) if
+                 os.path.isfile(os.path.join(folder_loc, f))]
+
+    for photo in photos:
+        photoName = str(Path(photo).stem)
+        if "_admin" in photoName:
+            os.remove(photo)
+
+    adminFile = open("data\\admin", "w")
+    admin1 = Es.encrypt_message("Name:admin")
+    admin2 = Es.encrypt_message("Nickname:admin")
+    admin3 = Es.encrypt_message("Password:admin")
+    admin4 = Es.encrypt_message("Gender:noun")
+    admin5 = Es.encrypt_message("Age:100")
+    admin6 = Es.encrypt_message("Birthday:2000/01/01")
+    adminFile.write("{}\n{}\n{}\n{}\n{}\n{}".format(admin1, admin2, admin3, admin4, admin5, admin6))
+    adminFile.close()
+
+    createAdmin()
 
 
 def createAdmin():
@@ -48,6 +77,7 @@ def createAdmin():
 
     speak("What is the Admin Password?")
     password = voice()
+    adminPassword = password
     adminContents = re.sub("Password:[a-z]{4,}", "Password:{}".format(password), adminContents)
 
     speak("What is the Admin Nickname?")
@@ -98,8 +128,6 @@ def createUser():
     speak("What is the User's Nickname?")
     nickname = voice()
     userContents = re.sub("Nickname:[a-z]+", "Nickname:{}".format(nickname), userContents)
-
-    print(userContents)
 
     userFile.seek(0)
     userFile.write(Es.encrypt_message(userContents))

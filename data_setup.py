@@ -2,6 +2,8 @@ import encryptionSystem as Es
 
 
 def fileCreation():
+    Es.generate_key()
+
     adminFile = open("data\\admin", "w")
     admin1 = Es.encrypt_message("Name:admin")
     admin2 = Es.encrypt_message("Nickname:admin")
@@ -12,11 +14,8 @@ def fileCreation():
     adminFile.write("{}\n{}\n{}\n{}\n{}\n{}".format(admin1, admin2, admin3, admin4, admin5, admin6))
     adminFile.close()
 
-    loginAttempts = open("data\\logins", "w")
-    loginAttempts.close()
-
     accounts = open("data\\accounts", "w")
-    text = Es.encrypt_message("False")
+    text = Es.encrypt_message("")
     accounts.write(text)
     accounts.close()
 

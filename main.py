@@ -124,6 +124,7 @@ def face_enter():
 
     isAdmin = False
     isUser = False
+    userName = "guest"
 
     face_locations = []
     face_encodings = []
@@ -162,8 +163,11 @@ def face_enter():
                 best_match_index = np.argmin(face_distances)
                 if matches[best_match_index]:
                     name = known_face_names[best_match_index]
+                    userName = name
                     if "_admin" in name:
                         isAdmin = True
+                    else:
+                        isUser = True
                     # break
 
                 face_names.append(name)
@@ -196,7 +200,15 @@ def face_enter():
     # Release handle to the webcam
     video_capture.release()
     cv2.destroyWindow('Face Recognition')
-    program(name)
+    if isAdmin:
+        setup.speak("Say Admin Password")
+        password = setup.voice()
+        if password == setup.adminPassword:
+            program(userName)
+        else:
+            raise SystemExit
+
+    program(userName)
 
 
 if __name__ == "__main__":
@@ -209,12 +221,14 @@ if __name__ == "__main__":
         data_setup.fileCreation()
     dataSetup.close()
 
+    '''
     accs = open("data\\accounts", "r")
     accsContent = Es.decrypt_message(accs.read())
 
-    # if accsContent == "":
-    # print("Creating Admin account...")
-    # setup.createAdmin()
-    # accs.close()
+    if accsContent == "":
+        print("Creating Admin account...")
+        accs.close()
+        setup.createAdmin()
+    '''
 
     face_enter()
