@@ -4,6 +4,7 @@ import setup
 
 def program():
     userInput = setup.voice()
+
     if "create" and "user" in userInput:
         commands.createUser()
 
