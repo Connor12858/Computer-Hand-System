@@ -4,7 +4,6 @@ import pyautogui as mouse
 
 keywords = ["Connor", "Conner"]
 engine = pyttsx3.init()
-engine.setProperty('voice', engine.getProperty('voices')[0].id)
 
 
 def text_input():
