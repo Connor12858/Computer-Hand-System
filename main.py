@@ -1,7 +1,9 @@
 import cv2
 import mediapipe as mp
-import numpy as np
 import pyautogui as mouse
+import voice
+import threading
+from multiprocessing import Process
 
 
 def program():
@@ -10,7 +12,7 @@ def program():
     hand_module = mp.solutions.hands
 
     # Get the computer screen size
-    comWidth, comHeight = mouse.size()
+    com_width, com_height = mouse.size()
 
     # Capturing video
     cap = cv2.VideoCapture(0)
@@ -18,7 +20,7 @@ def program():
     with hand_module.Hands(
             min_detection_confidence=0.8,
             max_num_hands=1,
-            min_tracking_confidence=0.5) as hands:
+            min_tracking_confidence=0.8) as hands:
         while cap.isOpened():
             success, video = cap.read()
             if not success:
@@ -37,76 +39,88 @@ def program():
                         video, hand_landmarks, hand_module.HAND_CONNECTIONS)
 
                 # Gets the thumb landmark for detecting left or right hand
-                normalizedLandmarkThumb = hand_landmarks.landmark[4]
+                normalized_landmark_thumb = hand_landmarks.landmark[4]
 
                 # Get the landmarks needed for detecting hand positions
-                normalizedLandmark20 = hand_landmarks.landmark[20]
-                normalizedLandmark16 = hand_landmarks.landmark[16]
-                normalizedLandmark12 = hand_landmarks.landmark[12]
-                normalizedLandmark17 = hand_landmarks.landmark[17]
-                normalizedLandmark13 = hand_landmarks.landmark[13]
-                normalizedLandmark9 = hand_landmarks.landmark[9]
-                normalizedLandmark8 = hand_landmarks.landmark[8]
-                normalizedLandmark5 = hand_landmarks.landmark[5]
+                normalized_landmark20 = hand_landmarks.landmark[20]
+                normalized_landmark16 = hand_landmarks.landmark[16]
+                normalized_landmark12 = hand_landmarks.landmark[12]
+                normalized_landmark17 = hand_landmarks.landmark[17]
+                normalized_landmark13 = hand_landmarks.landmark[13]
+                normalized_landmark9 = hand_landmarks.landmark[9]
+                normalized_landmark8 = hand_landmarks.landmark[8]
+                normalized_landmark5 = hand_landmarks.landmark[5]
 
                 # Preparing for mouse movement
-                normalizedPalm = hand_landmarks.landmark[0]
+                normalized_palm = hand_landmarks.landmark[0]
 
                 # Left hand controls
-                if normalizedLandmarkThumb.x > normalizedLandmark17.x:
+                if normalized_landmark_thumb.x > normalized_landmark17.x:
 
                     # MOVE MOUSE
-                    mouseCords = drawing_module._normalized_to_pixel_coordinates(normalizedPalm.x,
-                                                                                 normalizedPalm.y,
-                                                                                 comWidth, comHeight)
-                    mouse.moveTo(mouseCords)
+                    mouse_cords = drawing_module._normalized_to_pixel_coordinates(normalized_palm.x,
+                                                                                 normalized_palm.y,
+                                                                                 com_width, com_height)
+                    mouse.moveTo(mouse_cords)
 
                     # Left Click with left hand
-                    if (normalizedLandmark12.y > normalizedLandmark9.y) & (
-                            normalizedLandmark16.y > normalizedLandmark13.y) & (
-                            normalizedLandmark20.y > normalizedLandmark17.y) & (
-                            normalizedLandmark8.y > normalizedLandmark5.y):
+                    if (normalized_landmark12.y > normalized_landmark9.y) & (
+                            normalized_landmark16.y > normalized_landmark13.y) & (
+                            normalized_landmark20.y > normalized_landmark17.y) & (
+                            normalized_landmark8.y > normalized_landmark5.y):
                         mouse.leftClick()
 
                 # Right Hand controls
-                if normalizedLandmarkThumb.x < normalizedLandmark17.x:
+                if normalized_landmark_thumb.x < normalized_landmark17.x:
 
-                    mouseCords = drawing_module._normalized_to_pixel_coordinates(normalizedPalm.x,
-                                                                                 normalizedPalm.y,
-                                                                                 comWidth, comHeight)
-                    mouse.moveTo(mouseCords)
+                    mouse_cords = drawing_module._normalized_to_pixel_coordinates(normalized_palm.x,
+                                                                                 normalized_palm.y,
+                                                                                 com_width, com_height)
+                    mouse.moveTo(mouse_cords)
 
                     # Right click with right hand
-                    if (normalizedLandmark12.y > normalizedLandmark9.y) & (
-                            normalizedLandmark16.y > normalizedLandmark13.y) & (
-                            normalizedLandmark20.y > normalizedLandmark17.y) & (
-                            normalizedLandmark8.y > normalizedLandmark5.y):
+                    if (normalized_landmark12.y > normalized_landmark9.y) & (
+                            normalized_landmark16.y > normalized_landmark13.y) & (
+                            normalized_landmark20.y > normalized_landmark17.y) & (
+                            normalized_landmark8.y > normalized_landmark5.y):
                         mouse.rightClick()
 
                 # Scrolling with spider-man hands
-                if (normalizedLandmark12.y > normalizedLandmark9.y) & (
-                        normalizedLandmark16.y > normalizedLandmark13.y) & (
-                        normalizedLandmark20.y < normalizedLandmark17.y) & (
-                        normalizedLandmark8.y < normalizedLandmark5.y):
+                if (normalized_landmark12.y > normalized_landmark9.y) & (
+                        normalized_landmark16.y > normalized_landmark13.y) & (
+                        normalized_landmark20.y < normalized_landmark17.y) & (
+                        normalized_landmark8.y < normalized_landmark5.y):
 
-                    topDown = comHeight / 2
+                    top_down = com_height / 2
 
-                    mouseX, mouseY = mouseCords
-                    if mouseY > topDown:
-                        mouse.scroll(-30)
+                    mouse_x, mouse_y = mouse_cords
+                    if mouse_y > top_down:
+                        mouse.scroll(-70)
                         continue
-                    if mouseY < topDown:
-                        mouse.scroll(30)
+                    if mouse_y < top_down:
+                        mouse.scroll(70)
                         continue
                     continue
 
             # Create the video footage
-            cv2.imshow('Hand Tracking', video)
-            if cv2.waitKey(5) & 0xFF == ord('q'):
-                break
+            # cv2.imshow('Hand Tracking', video)
+            # if cv2.waitKey(5) & 0xFF == ord('q'):
+            #     break
     cap.release()
-    cv2.destroyWindow('Hand Tracking')
+    # cv2.destroyWindow('Hand Tracking')
 
 
 if __name__ == "__main__":
     program()
+
+    # p = Process(target=voice.background_check(), args=())
+    # p2 = Process(target=program(), args=())
+    # p.start()
+    # p.join()
+    # p2.start()
+    # p2.join()
+
+    # t = threading.Thread(target=voice.background_check(), args=[])
+    # t2 = threading.Thread(target=program(), args=[])
+    # t.start()
+    # t2.start()
