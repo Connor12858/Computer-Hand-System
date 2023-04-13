@@ -45,32 +45,23 @@ def program():
                     drawing_module.draw_landmarks(
                         video, hand_landmarks, hand_module.HAND_CONNECTIONS)
                     
+                # Create the video footage
+                cv2.imshow('Hand Tracking', video)
+                        
                 # Move the mouse according to location
                 mouse_cords = drawing_module._normalized_to_pixel_coordinates(hand_landmarks.landmark[8].x,
                                                                             hand_landmarks.landmark[8].y,
                                                                             com_width + 150, com_height + 150)
                 if not mouse_cords == None:
-                    mouse.moveTo((mouse_cords[0], mouse_cords[1])) #TODO make easier on left and top side
+                    mouse.moveTo(mouse_cords) #TODO make easier on left and top side
                 
-            # Create the video footage
-            cv2.imshow('Hand Tracking', video)
+            # On 'q' quit and close everything
             if cv2.waitKey(5) & 0xFF == ord('q'):
                 break
     cap.release()
     cv2.destroyWindow('Hand Tracking')
 
 
+# Entrypoint
 if __name__ == "__main__":
     program()
-
-    # p = Process(target=voice.background_check(), args=())
-    # p2 = Process(target=program(), args=())
-    # p.start()
-    # p.join()
-    # p2.start()
-    # p2.join()
-
-    # t = threading.Thread(target=voice.background_check(), args=[])
-    # t2 = threading.Thread(target=program(), args=[])
-    # t.start()
-    # t2.start()
